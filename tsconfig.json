@@ -4,7 +4,8 @@
         "target": "esnext",
         "lib": [
             "dom",
-            "esnext"
+            "esnext",
+            "es5"
         ]
     }
 }
