@@ -1,6 +1,6 @@
 // Update with your config settings.
 
-import dotenv from "dotenv";
+const dotenv = require("dotenv");
 dotenv.config();
 
 module.exports = {
