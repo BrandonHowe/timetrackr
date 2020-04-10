@@ -12,7 +12,7 @@ require("./heartbeats")(app);
 require("./login")(app);
 require("./data/dataRoutes")(app);
 
-const port = 1700;
+const port = process.env.PORT ?? 1700;
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
 
