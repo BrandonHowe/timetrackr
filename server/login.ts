@@ -32,6 +32,36 @@ module.exports = (app) => {
         }
     });
 
+    app.post('/loginIntellij', async (req, res) => {
+        const username = req.body.username;
+        const password = req.body.password;
+        const matchingUser = await knex("users")
+            .where({username})
+            .first()
+            .catch(e => {
+                throw e;
+            });
+        if (matchingUser) {
+            const passMatches = await bcrypt.compare(password, matchingUser.password);
+            if (passMatches) {
+                const seshkey = crypto.randomBytes(16).toString('hex').substring(0, 16);
+                await knex("users")
+                    .where({username})
+                    .update({
+                        seshkey
+                    })
+                    .catch(e => {
+                        throw e;
+                    });
+                res.send(seshkey);
+            } else {
+                res.send("false");
+            }
+        } else {
+            res.send("false")
+        }
+    });
+
     app.post('/loginSeshkey', async (req, res) => {
         const seshkey = req.body.seshkey;
         const matchingUser = await knex("users")
@@ -44,6 +74,21 @@ module.exports = (app) => {
             res.send({status: true});
         } else {
             res.send({status: false});
+        }
+    });
+
+    app.post('/loginSeshkeyIntellij', async (req, res) => {
+        const seshkey = req.body.seshkey;
+        const matchingUser = await knex("users")
+            .where({seshkey})
+            .first()
+            .catch(e => {
+                throw e;
+            });
+        if (matchingUser) {
+            res.send("true");
+        } else {
+            res.send("false");
         }
     });
 
@@ -60,7 +105,6 @@ module.exports = (app) => {
     });
 
     app.post('/createUser', async (req, res) => {
-        console.log("post");
         const username = req.body.username;
         const [password, userExists] = await Promise.all([
             bcrypt.hash(req.body.password, 13),
@@ -79,7 +123,6 @@ module.exports = (app) => {
                 .catch(e => {
                     throw e;
                 });
-            console.log("new user");
             res.send({success: true, data: seshkey});
         } else {
             res.send({success: false});

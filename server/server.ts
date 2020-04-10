@@ -10,6 +10,7 @@ app.use(bodyParser.json());
 
 require("./heartbeats")(app);
 require("./login")(app);
+require("./data/dataRoutes")(app);
 
 const port = 1700;
 

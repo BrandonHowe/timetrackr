@@ -16,7 +16,7 @@ const getHighestEvent = async (): Promise<number> => {
         .catch(e => {
             throw e;
         });
-    return Math.max(...eventIdList) + 1;
+    return eventIdList.length > 0 ? Math.max(...Array.from(eventIdList, l => l.eventid)) + 1 : 1;
 };
 
 const getHighestUserId = async (): Promise<number> => {
@@ -37,7 +37,8 @@ const getIdBySeshkey = async (seshkey: string): Promise<number> => {
         .catch(e => {
             throw e;
         });
-    return user.userid;
+    console.log(user);
+    return user ? user.userid : -1;
 };
 
 export { doesUserExist, getHighestEvent, getHighestUserId, getIdBySeshkey }

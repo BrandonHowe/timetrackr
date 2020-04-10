@@ -7,22 +7,23 @@ interface HeartbeatData {
     timeend: number,
     editor: string,
     project: string,
-    file: string,
     language: string,
+    file: string,
     eventid: number
 }
 
-const newHeartbeat = async (userid: number, editor: string, project: string, file: string, language: string) => {
+const newHeartbeat = async (userid: number, editor: string, project: string, language: string, file: string): Promise<boolean> => {
     const currentTime = Date.now();
+    console.log(`${userid}|${editor}|${project}|${language}|${file}|${currentTime}|${currentTime - 300000}`);
     const recentEvent = await knex("events")
         .where({
             userid,
             editor,
             project,
-            file,
-            language
+            language,
+            file
         })
-        .where(
+        .andWhere(
             "timeend", ">", (currentTime - 300000)
         )
         .first()
@@ -30,39 +31,43 @@ const newHeartbeat = async (userid: number, editor: string, project: string, fil
             throw e;
         });
     if (recentEvent) {
+        console.log(`There is a recent event: old time: ${recentEvent.timeend} | new time: ${currentTime}`);
         await knex("events")
             .where({
-                userid,
-                editor,
-                project,
-                file,
-                language
+                eventid: recentEvent.eventid
             })
-            .where("timeend", ">", (currentTime - 30000))
-            .first()
             .update({
                 timeend: currentTime
             })
-            .catch(e => {
-                throw e;
+            .then(() => {
+                return true;
             })
+            .catch(() => {
+                return false;
+            });
+        return false;
     } else {
+        console.log("New event");
         const heartbeat = {
             userid,
             timestart: currentTime - 1,
             timeend: currentTime,
             editor,
             project,
-            file,
             language,
+            file,
             eventid: await getHighestEvent()
         } as HeartbeatData;
         await knex("events")
             .insert(heartbeat)
-            .catch(e => {
-                throw e;
+            .then(() => {
+                return true;
+            })
+            .catch(() => {
+                return false;
             });
+        return false;
     }
 };
 
-export { newHeartbeat }
+export { newHeartbeat, HeartbeatData }
