@@ -5,7 +5,7 @@
   "main": "knex.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm installl && ts-node server/server.ts"
+    "start": "npm install && ts-node server/server.ts"
   },
   "author": "",
   "license": "ISC",
