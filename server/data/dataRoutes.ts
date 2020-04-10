@@ -1,5 +1,6 @@
 import { findTotalDuration } from "./helpers/datahelpers";
-import { getData } from "./data";
+import { getData, getDataDays } from "./data";
+import { HeartbeatData } from "../helpers/heartbeats";
 
 module.exports = (app) => {
     app.get("/userData/timeSpent/:userid/:midnight", async (req, res) => {
@@ -8,5 +9,66 @@ module.exports = (app) => {
         const totalDuration = await findTotalDuration(await getData(userid, midnight));
         console.log(`Total duration: ${totalDuration}`);
         res.send(totalDuration.toString());
+    });
+    app.get("/userData/daysData/:userid/:midnight/:days", async (req, res) => {
+        const userid = Number(req.params.userid);
+        const midnight = Number(req.params.midnight);
+        const days = Number(req.params.days);
+        const daysArr = await getDataDays(userid, midnight, days);
+        res.send(JSON.stringify(daysArr));
+    });
+    app.get("/userData/totalDaysData/:userid/:midnight/:days", async (req, res) => {
+        const userid = Number(req.params.userid);
+        const midnight = Number(req.params.midnight);
+        const days = Number(req.params.days);
+        const daysArr = await getDataDays(userid, midnight, days);
+        const mappedArr = daysArr.map(l => {
+            let total = 0;
+            for (const event of l) {
+                total += event.timeend - event.timestart;
+            }
+            return total;
+        });
+        res.send(JSON.stringify(mappedArr));
+    });
+    app.get("/userData/projectDaysData/:userid/:midnight/:days", async (req, res) => {
+        const userid = Number(req.params.userid);
+        const midnight = Number(req.params.midnight);
+        const days = Number(req.params.days);
+        const daysArr = await getDataDays(userid, midnight, days);
+        const mappedArr = daysArr.map(l => {
+            let total = {};
+            for (const event of l) {
+                if (total[event.project]) {
+                    total[event.project] += event.timeend - event.timestart;
+                } else {
+                    total[event.project] = event.timeend - event.timestart;
+                }
+            }
+            return total;
+        });
+        let result = [];
+        mappedArr.map((l: Record<string, HeartbeatData>, idx) => {
+            for (const i in l) {
+                if (!l.hasOwnProperty(i)) {
+                    continue;
+                }
+                const event = l[i];
+                if (result.findIndex(l => l.label === i) !== -1) {
+                    result[result.findIndex(l => l.label === i)].data[idx] += event;
+                } else {
+                    result.push({
+                        label: i,
+                        backgroundColor: `#${parseInt(i, 36).toString(16).slice(0, 6)}`,
+                        data: []
+                    });
+                    for (let j = 0; j < days; j++) {
+                        result[result.length - 1].data.push(0);
+                    }
+                    result[result.length - 1].data[idx] = event;
+                }
+            }
+        });
+        res.send(JSON.stringify(result));
     });
 };
