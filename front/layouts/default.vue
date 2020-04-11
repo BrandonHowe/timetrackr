@@ -1,10 +1,10 @@
 <template>
-    <v-app dark>
+    <v-app>
         <v-navigation-drawer
             v-model="drawer"
             :mini-variant="miniVariant"
             :clipped="clipped"
-            fixed
+            fixedchart
             app
         >
             <v-list>

@@ -1,7 +1,6 @@
 <template>
     <div class="small">
         <line-chart :chart-data="datacollection" :options="options" :height="400" :width="400"></line-chart>
-        <button @click="fillData()">Randomize</button>
     </div>
 </template>
 
@@ -25,11 +24,15 @@
                         }
                     },
                     scales: {
+                        xAxes: [{
+                            stacked: true
+                        }],
                         yAxes: [{
                             ticks: {
                                 // Include a dollar sign in the ticks
                                 callback: () => ""
-                            }
+                            },
+                            stacked: true
                         }],
                         y: {
                             beginAtZero: true
@@ -72,7 +75,7 @@
             },
             getTimeOnDayAgo (daysAgo = 0) {
                 let d = new Date();
-                d.setDate(d.getDate() - daysAgo);
+                d.setDate(d.getDate() - daysAgo + 1);
                 d.setUTCHours(0, 0, 0, 0);
                 return Number(d);
             },
@@ -83,7 +86,7 @@
             async generateDays (dayCount = 1) {
                 let labels = [];
                 for (let i = 0; i < dayCount; i++) {
-                    labels.push(`${dayCount - i} ${i === dayCount - 1 ? "day" : "days"} ago`);
+                    labels.push(`${i === 0 ? "Today" : `${dayCount - i} ${i === dayCount - 1 ? "day" : "days"} ago`}`);
                 }
                 const datasets = await this.getDays(1, this.getTimeOnDayAgo(0), 7);
                 console.log(datasets);
@@ -94,9 +97,6 @@
             },
             async fillData () {
                 this.datacollection = await this.generateDays(7);
-            },
-            getRandomInt () {
-                return Math.floor(Math.random() * (50 - 5 + 1)) + 5
             }
         }
     }
