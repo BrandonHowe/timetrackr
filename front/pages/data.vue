@@ -1,7 +1,11 @@
 <template>
     <div class="data">
-        <LineChart></LineChart>
-        <LanguageChart></LanguageChart>
+        <LineChart
+            class="chart"
+        ></LineChart>
+        <LanguageChart
+            class="chart"
+        ></LanguageChart>
     </div>
 </template>
 
@@ -20,5 +24,7 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
+    .chart {
+        display: inline-block;
+    }
 </style>

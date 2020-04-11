@@ -89,9 +89,10 @@ module.exports = (app) => {
             if (!data.hasOwnProperty(i)) {
                 continue;
             }
-            result.datasets[0].data.push(data[i]);
+            const currentIdx = i !== "PLAIN_TEXT" ? i : "Other";
+            result.datasets[0].data.push(data[currentIdx]);
             result.datasets[0].backgroundColor.push(new ColorHash().hex(i));
-            result.labels.push(i);
+            result.labels.push(currentIdx);
         }
         res.send(JSON.stringify(result));
     });

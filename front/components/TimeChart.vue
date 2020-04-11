@@ -101,14 +101,8 @@
             },
             async fillData () {
                 this.datacollection = await this.generateDays(7);
+                console.log(this.datacollection);
             },
         },
     }
 </script>
-
-<style>
-    .small {
-        max-width: 600px;
-        margin: 150px auto;
-    }
-</style>
