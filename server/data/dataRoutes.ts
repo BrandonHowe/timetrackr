@@ -78,6 +78,8 @@ module.exports = (app) => {
         const data = await getLanguagesData(userid, midnight, days);
         let result = {
             datasets: [{
+                label: "Languages",
+                backgroundColor: [],
                 data: []
             }],
             labels: []
@@ -87,6 +89,7 @@ module.exports = (app) => {
                 continue;
             }
             result.datasets[0].data.push(data[i]);
+            result.datasets[0].backgroundColor.push(`#${parseInt(i, 36).toString(16).slice(0, 6)}`);
             result.labels.push(i);
         }
         res.send(JSON.stringify(result));
