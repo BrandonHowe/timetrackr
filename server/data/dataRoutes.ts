@@ -1,5 +1,5 @@
 import { findTotalDuration } from "./helpers/datahelpers";
-import { getData, getDataDays } from "./data";
+import { getData, getDataDays, getLanguagesData } from "./data";
 import { HeartbeatData } from "../helpers/heartbeats";
 
 module.exports = (app) => {
@@ -69,6 +69,26 @@ module.exports = (app) => {
                 }
             }
         });
+        res.send(JSON.stringify(result));
+    });
+    app.get("/userData/languageData/:userid/:midnight/:days", async (req, res) => {
+        const userid = Number(req.params.userid);
+        const midnight = Number(req.params.midnight);
+        const days = Number(req.params.days);
+        const data = await getLanguagesData(userid, midnight, days);
+        let result = {
+            datasets: [{
+                data: []
+            }],
+            labels: []
+        };
+        for (const i in data) {
+            if (!data.hasOwnProperty(i)) {
+                continue;
+            }
+            result.datasets[0].data.push(data[i]);
+            result.labels.push(i);
+        }
         res.send(JSON.stringify(result));
     });
 };

@@ -39,4 +39,24 @@ const getDataDays = async (userid: number, midnight: number, days: number = 1): 
     return Object.values(eventObj);
 };
 
-export { getData, getDataDays }
+const getLanguagesData = async (userid: number, midnight: number, days: number = 1): Promise<any> => {
+    const lastMidnight = midnight - (86400000 * days);
+    const events = <HeartbeatData[]>await knex("events")
+        .where({userid})
+        .andWhere("timestart", "<", midnight)
+        .andWhere("timeend", ">", lastMidnight)
+        .catch(e => {
+            throw e;
+        });
+    let data = {};
+    for (const event of events) {
+        if (data[event.project]) {
+            data[event.project] += event.timeend - event.timestart;
+        } else {
+            data[event.project] = event.timeend - event.timestart;
+        }
+    }
+    return data;
+};
+
+export { getData, getDataDays, getLanguagesData }

@@ -1,15 +1,18 @@
 <template>
     <div class="data">
         <LineChart></LineChart>
+        <LanguageChart></LanguageChart>
     </div>
 </template>
 
 <script>
-    import LineChart from "../components/RandomChart.vue";
+    import LineChart from "../components/TimeChart.vue";
+    import LanguageChart from "../components/LanguageChart.vue";
 
     export default {
         name: 'data',
         components: {
+            LanguageChart,
             LineChart
         }
     };

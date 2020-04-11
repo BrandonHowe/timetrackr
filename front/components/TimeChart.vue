@@ -11,7 +11,7 @@
     export default {
         name: "RandomChart",
         components: {
-            LineChart
+            LineChart,
         },
         data () {
             return {
@@ -20,30 +20,29 @@
                     responsive: false,
                     legend: {
                         labels: {
-                            fontSize: 14
-                        }
+                            fontSize: 14,
+                        },
                     },
                     scales: {
                         xAxes: [{
-                            stacked: true
+                            stacked: true,
                         }],
                         yAxes: [{
                             ticks: {
                                 // Include a dollar sign in the ticks
-                                callback: () => ""
+                                callback: () => "",
                             },
-                            stacked: true
+                            stacked: true,
                         }],
                         y: {
-                            beginAtZero: true
-                        }
+                            beginAtZero: true,
+                        },
                     },
                     tooltips: {
                         mode: 'index',
                         callbacks: {
-                            // Use the footer callback to display the sum of the items showing in the tooltip
-                            label: (tooltipItems) => {
-                                const duration = Number(tooltipItems.yLabel);
+                            label: (tooltipItem, data) => {
+                                const duration = Number(tooltipItem.yLabel);
                                 let seconds = Math.floor((duration / 1000) % 60),
                                     minutes = Math.floor((duration / (1000 * 60)) % 60),
                                     hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
@@ -51,10 +50,10 @@
                                 hours = (hours < 10) ? "0" + hours : hours;
                                 minutes = (minutes < 10) ? "0" + minutes : minutes;
                                 seconds = (seconds < 10) ? "0" + seconds : seconds;
-                                return `${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds > 0 ? `${seconds}s` : ""}`;
+                                return `${`${data.datasets[tooltipItem.datasetIndex].label}:` || ''} ${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds > 0 ? `${seconds}s` : ""}`;
                             },
                         },
-                        footerFontStyle: 'normal'
+                        footerFontStyle: 'normal',
                     },
                 },
             }
@@ -86,25 +85,30 @@
             async generateDays (dayCount = 1) {
                 let labels = [];
                 for (let i = 0; i < dayCount; i++) {
-                    labels.push(`${i === 0 ? "Today" : `${dayCount - i} ${i === dayCount - 1 ? "day" : "days"} ago`}`);
+                    if (i === dayCount - 1) {
+                        labels.push("Today");
+                    } else if (i === dayCount - 2) {
+                        labels.push("Yesterday");
+                    } else {
+                        labels.push(`${dayCount - i - 1} ${i === dayCount - 2 ? "day" : "days"} ago`);
+                    }
                 }
                 const datasets = await this.getDays(1, this.getTimeOnDayAgo(0), 7);
-                console.log(datasets);
                 return {
                     labels,
-                    datasets
+                    datasets,
                 }
             },
             async fillData () {
                 this.datacollection = await this.generateDays(7);
-            }
-        }
+            },
+        },
     }
 </script>
 
 <style>
     .small {
         max-width: 600px;
-        margin:  150px auto;
+        margin: 150px auto;
     }
 </style>
