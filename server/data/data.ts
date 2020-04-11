@@ -50,10 +50,10 @@ const getLanguagesData = async (userid: number, midnight: number, days: number =
         });
     let data = {};
     for (const event of events) {
-        if (data[event.project]) {
-            data[event.project] += event.timeend - event.timestart;
+        if (data[event.language]) {
+            data[event.language] += event.timeend - event.timestart;
         } else {
-            data[event.project] = event.timeend - event.timestart;
+            data[event.language] = event.timeend - event.timestart;
         }
     }
     return data;
