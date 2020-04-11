@@ -39,7 +39,7 @@ const newHeartbeat = async (userid: number, editor: string, project: string, lan
                 eventid: recentEvent.eventid
             })
             .update({
-                timeend: currentTime
+                timeend: currentTime + 300000
             })
             .then(() => {
                 return true;
