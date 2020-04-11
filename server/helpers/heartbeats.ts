@@ -26,12 +26,14 @@ const newHeartbeat = async (userid: number, editor: string, project: string, lan
         .andWhere(
             "timeend", ">", (currentTime - 300000)
         )
+        .andWhere(
+            "timeend", "<", currentTime
+        )
         .first()
         .catch(e => {
             throw e;
         });
     if (recentEvent) {
-        console.log(`There is a recent event: old time: ${recentEvent.timeend} | new time: ${currentTime}`);
         await knex("events")
             .where({
                 eventid: recentEvent.eventid
@@ -47,11 +49,10 @@ const newHeartbeat = async (userid: number, editor: string, project: string, lan
             });
         return false;
     } else {
-        console.log("New event");
         const heartbeat = {
             userid,
-            timestart: currentTime - 1,
-            timeend: currentTime,
+            timestart: currentTime,
+            timeend: currentTime + 300000,
             editor,
             project,
             language,
