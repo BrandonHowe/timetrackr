@@ -1,6 +1,7 @@
 import { findTotalDuration } from "./helpers/datahelpers";
 import { getData, getDataDays, getLanguagesData } from "./data";
 import { HeartbeatData } from "../helpers/heartbeats";
+const ColorHash = require("color-hash");
 
 module.exports = (app) => {
     app.get("/userData/timeSpent/:userid/:midnight", async (req, res) => {
@@ -59,7 +60,7 @@ module.exports = (app) => {
                 } else {
                     result.push({
                         label: i,
-                        backgroundColor: `#${parseInt(i, 36).toString(16).slice(0, 6)}`,
+                        backgroundColor: new ColorHash().hex(i),
                         data: []
                     });
                     for (let j = 0; j < days; j++) {
@@ -89,7 +90,7 @@ module.exports = (app) => {
                 continue;
             }
             result.datasets[0].data.push(data[i]);
-            result.datasets[0].backgroundColor.push(`#${parseInt(i, 36).toString(16).slice(0, 6)}`);
+            result.datasets[0].backgroundColor.push(new ColorHash().hex(i));
             result.labels.push(i);
         }
         res.send(JSON.stringify(result));
