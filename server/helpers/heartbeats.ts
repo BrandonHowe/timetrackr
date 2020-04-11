@@ -24,10 +24,10 @@ const newHeartbeat = async (userid: number, editor: string, project: string, lan
             file
         })
         .andWhere(
-            "timeend", ">", (currentTime - 300000)
+            "timeend", ">", currentTime
         )
         .andWhere(
-            "timeend", "<", currentTime
+            "timeend", "<", (currentTime + 300000)
         )
         .first()
         .catch(e => {
