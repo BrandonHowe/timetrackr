@@ -1,6 +1,7 @@
 import { findTotalDuration } from "./helpers/datahelpers";
 import { getData, getDataDays, getEditorData, getLanguagesData } from "./data";
 import { HeartbeatData } from "../helpers/heartbeats";
+
 const ColorHash = require("color-hash");
 
 module.exports = (app) => {
@@ -61,7 +62,7 @@ module.exports = (app) => {
                     result.push({
                         label: i,
                         backgroundColor: new ColorHash().hex(i),
-                        data: []
+                        data: [],
                     });
                     for (let j = 0; j < days; j++) {
                         result[result.length - 1].data.push(0);
@@ -81,9 +82,9 @@ module.exports = (app) => {
             datasets: [{
                 label: "Languages",
                 backgroundColor: [],
-                data: []
+                data: [],
             }],
-            labels: []
+            labels: [],
         };
         for (const i in data) {
             if (!data.hasOwnProperty(i)) {
@@ -105,17 +106,18 @@ module.exports = (app) => {
             datasets: [{
                 label: "Editors",
                 backgroundColor: [],
-                data: []
+                data: [],
             }],
-            labels: []
+            labels: [],
         };
         for (const i in data) {
             if (!data.hasOwnProperty(i)) {
                 continue;
             }
-            result.datasets[0].data.push(data[i]);
+            const currentIdx = i === "idea" ? "IntelliJ IDEA" : i;
+            result.datasets[0].data.push(data[currentIdx]);
             result.datasets[0].backgroundColor.push(new ColorHash().hex(i));
-            result.labels.push(i);
+            result.labels.push(currentIdx);
         }
         res.send(JSON.stringify(result));
     });
