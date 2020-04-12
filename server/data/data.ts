@@ -58,4 +58,17 @@ const getEditorData = async (userid: number, midnight: number, days: number = 1)
     return data;
 };
 
-export { getData, getDataDays, getLanguagesData, getEditorData }
+const getProjectData = async (userid: number, midnight: number, days: number = 1): Promise<Record<string, number>> => {
+    const events = await getData(userid, midnight, days);
+    let data = {};
+    for (const event of events) {
+        if (data[event.project]) {
+            data[event.project] += event.timeend - event.timestart;
+        } else {
+            data[event.project] = event.timeend - event.timestart;
+        }
+    }
+    return data;
+};
+
+export { getData, getDataDays, getLanguagesData, getEditorData, getProjectData }

@@ -121,4 +121,27 @@ module.exports = (app) => {
         }
         res.send(JSON.stringify(result));
     });
+    app.get("/userData/projectData/:userid/:midnight/:days", async (req, res) => {
+        const userid = Number(req.params.userid);
+        const midnight = Number(req.params.midnight);
+        const days = Number(req.params.days);
+        const data = await getEditorData(userid, midnight, days);
+        let result = {
+            datasets: [{
+                label: "Projects",
+                backgroundColor: [],
+                data: [],
+            }],
+            labels: [],
+        };
+        for (const i in data) {
+            if (!data.hasOwnProperty(i)) {
+                continue;
+            }
+            result.datasets[0].data.push(data[i]);
+            result.datasets[0].backgroundColor.push(new ColorHash().hex(i));
+            result.labels.push(i);
+        }
+        res.send(JSON.stringify(result));
+    });
 };

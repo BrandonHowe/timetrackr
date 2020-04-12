@@ -60,6 +60,12 @@ const newHeartbeat = async (userid: number, editor: string, project: string, lan
             eventid: await getHighestEvent()
         } as HeartbeatData;
         await knex("events")
+            .update({timeend: currentTime})
+            .where("timeend", ">", currentTime)
+            .catch(e => {
+                throw e;
+            });
+        await knex("events")
             .insert(heartbeat)
             .then(() => {
                 return true;
