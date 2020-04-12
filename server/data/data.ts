@@ -36,10 +36,11 @@ const getLanguagesData = async (userid: number, midnight: number, days: number =
     const events = await getData(userid, midnight, days);
     let data = {};
     for (const event of events) {
-        if (data[event.language]) {
-            data[event.language] += event.timeend - event.timestart;
+        const currentLang = event.language === "PLAIN_TEXT" ? "Other" : event.language;
+        if (data[currentLang]) {
+            data[currentLang] += event.timeend - event.timestart;
         } else {
-            data[event.language] = event.timeend - event.timestart;
+            data[currentLang] = event.timeend - event.timestart;
         }
     }
     return data;
@@ -71,4 +72,9 @@ const getProjectData = async (userid: number, midnight: number, days: number = 1
     return data;
 };
 
-export { getData, getDataDays, getLanguagesData, getEditorData, getProjectData }
+const getTotalOverDays = async (userid: number, midnight: number, days: number = 1) => {
+    const events = await getData(userid, midnight, days);
+    return events.reduce((acc, cur) => Number(acc + Number(cur.timeend) - Number(cur.timestart)), 0);
+};
+
+export { getData, getDataDays, getLanguagesData, getEditorData, getProjectData, getTotalOverDays }
