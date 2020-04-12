@@ -1,5 +1,5 @@
 import { findTotalDuration } from "./helpers/datahelpers";
-import { getData, getDataDays, getLanguagesData } from "./data";
+import { getData, getDataDays, getEditorData, getLanguagesData } from "./data";
 import { HeartbeatData } from "../helpers/heartbeats";
 const ColorHash = require("color-hash");
 
@@ -93,6 +93,29 @@ module.exports = (app) => {
             result.datasets[0].data.push(data[currentIdx]);
             result.datasets[0].backgroundColor.push(new ColorHash().hex(i));
             result.labels.push(currentIdx);
+        }
+        res.send(JSON.stringify(result));
+    });
+    app.get("/userData/editorData/:userid/:midnight/:days", async (req, res) => {
+        const userid = Number(req.params.userid);
+        const midnight = Number(req.params.midnight);
+        const days = Number(req.params.days);
+        const data = await getEditorData(userid, midnight, days);
+        let result = {
+            datasets: [{
+                label: "Editors",
+                backgroundColor: [],
+                data: []
+            }],
+            labels: []
+        };
+        for (const i in data) {
+            if (!data.hasOwnProperty(i)) {
+                continue;
+            }
+            result.datasets[0].data.push(data[i]);
+            result.datasets[0].backgroundColor.push(new ColorHash().hex(i));
+            result.labels.push(i);
         }
         res.send(JSON.stringify(result));
     });
