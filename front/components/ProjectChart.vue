@@ -1,5 +1,5 @@
 <template>
-    <div class="languageChart">
+    <div class="projectChart">
         <DoughnutChart
             :chart-data="datacollection"
             :options="options"
@@ -10,13 +10,12 @@
 </template>
 
 <script>
-    import DoughnutChart from './ChartData/DoughnutChart'
+    import DoughnutChart from "./ChartData/DoughnutChart";
     import { currentUrl } from "../assets/config";
-
     export default {
-        name: "LanguageChart",
+        name: "ProjectChart",
         components: {
-            DoughnutChart,
+            DoughnutChart
         },
         data () {
             return {
@@ -28,7 +27,7 @@
                     },
                     title: {
                         display: true,
-                        text: 'Languages'
+                        text: 'Projects'
                     },
                     animation: {
                         animateScale: true,
@@ -60,7 +59,7 @@
         },
         methods: {
             async getLanguages (user, timestamp, days) {
-                const resp = await fetch(`${currentUrl}userData/languageData/${user}/${timestamp}/${days}`);
+                const resp = await fetch(`${currentUrl}userData/projectData/${user}/${timestamp}/${days}`);
                 return await resp.json();
             },
             getTimeOnDayAgo (daysAgo = 0) {

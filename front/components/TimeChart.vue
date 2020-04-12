@@ -1,11 +1,16 @@
 <template>
     <div class="small">
-        <line-chart :chart-data="datacollection" :options="options" :height="400" :width="400"></line-chart>
+        <LineChart
+            :chart-data="datacollection"
+            :options="options"
+            :height="300"
+            :width="300"
+        ></LineChart>
     </div>
 </template>
 
 <script>
-    import LineChart from './LineChart'
+    import LineChart from './ChartData/LineChart'
     import { currentUrl } from '../assets/config';
 
     export default {
@@ -15,7 +20,7 @@
         },
         data () {
             return {
-                datacollection: null,
+                datacollection: {},
                 options: {
                     responsive: false,
                     legend: {
@@ -25,7 +30,11 @@
                     },
                     scales: {
                         xAxes: [{
+                            gridLines: {
+                                display: false
+                            },
                             stacked: true,
+                            barPercentage: 1,
                         }],
                         yAxes: [{
                             ticks: {
@@ -42,15 +51,19 @@
                         mode: 'index',
                         callbacks: {
                             label: (tooltipItem, data) => {
-                                const duration = Number(tooltipItem.yLabel);
-                                let seconds = Math.floor((duration / 1000) % 60),
-                                    minutes = Math.floor((duration / (1000 * 60)) % 60),
-                                    hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+                                if (tooltipItem.yLabel > 0) {
+                                    const duration = Number(tooltipItem.yLabel);
+                                    let seconds = Math.floor((duration / 1000) % 60),
+                                        minutes = Math.floor((duration / (1000 * 60)) % 60),
+                                        hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
 
-                                hours = (hours < 10) ? "0" + hours : hours;
-                                minutes = (minutes < 10) ? "0" + minutes : minutes;
-                                seconds = (seconds < 10) ? "0" + seconds : seconds;
-                                return `${`${data.datasets[tooltipItem.datasetIndex].label}:` || ''} ${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds > 0 ? `${seconds}s` : ""}`;
+                                    hours = (hours < 10) ? "0" + hours : hours;
+                                    minutes = (minutes < 10) ? "0" + minutes : minutes;
+                                    seconds = (seconds < 10) ? "0" + seconds : seconds;
+                                    return `${`${data.datasets[tooltipItem.datasetIndex].label}:` || ''} ${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds > 0 ? `${seconds}s` : ""}`;
+                                } else {
+                                    return "";
+                                }
                             },
                         },
                         footerFontStyle: 'normal',
@@ -101,7 +114,6 @@
             },
             async fillData () {
                 this.datacollection = await this.generateDays(7);
-                console.log(this.datacollection);
             },
         },
     }

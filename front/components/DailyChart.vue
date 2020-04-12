@@ -1,5 +1,5 @@
 <template>
-    <div class="languageChart">
+    <div class="dailyChart">
         <DoughnutChart
             :chart-data="datacollection"
             :options="options"
@@ -10,13 +10,12 @@
 </template>
 
 <script>
-    import DoughnutChart from './ChartData/DoughnutChart'
+    import DoughnutChart from "./ChartData/DoughnutChart";
     import { currentUrl } from "../assets/config";
-
     export default {
-        name: "LanguageChart",
+        name: "DailyChart",
         components: {
-            DoughnutChart,
+            DoughnutChart
         },
         data () {
             return {
@@ -24,11 +23,11 @@
                 options: {
                     responsive: false,
                     legend: {
-                        position: 'top',
+                        display: false,
                     },
                     title: {
                         display: true,
-                        text: 'Languages'
+                        text: 'Today'
                     },
                     animation: {
                         animateScale: true,
@@ -38,19 +37,7 @@
                         // mode: 'index',
                         callbacks: {
                             label: (tooltipItem, data) => {
-                                const duration = Number(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]);
-                                if (duration > 0) {
-                                    let seconds = Math.floor((duration / 1000) % 60),
-                                        minutes = Math.floor((duration / (1000 * 60)) % 60),
-                                        hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
-
-                                    hours = (hours < 10) ? "0" + hours : hours;
-                                    minutes = (minutes < 10) ? "0" + minutes : minutes;
-                                    seconds = (seconds < 10) ? "0" + seconds : seconds;
-                                    return `${`${data.labels[tooltipItem.index]}:` || ''} ${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds > 0 ? `${seconds}s` : ""}`;
-                                } else {
-                                    return "";
-                                }
+                                return `${data.labels[tooltipItem.index]}: ${data.datasets[0].data[tooltipItem.index]}% of average`
                             },
                         },
                         footerFontStyle: 'normal',
@@ -60,7 +47,7 @@
         },
         methods: {
             async getLanguages (user, timestamp, days) {
-                const resp = await fetch(`${currentUrl}userData/languageData/${user}/${timestamp}/${days}`);
+                const resp = await fetch(`${currentUrl}userData/timeTodayComparedToDays/${user}/${timestamp}/${days}`);
                 return await resp.json();
             },
             getTimeOnDayAgo (daysAgo = 0) {
@@ -71,6 +58,7 @@
             },
             async fillData () {
                 this.datacollection = await this.getLanguages(1, this.getTimeOnDayAgo(0), 7);
+                console.log(this.datacollection);
             },
         },
         mounted () {
