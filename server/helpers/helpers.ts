@@ -37,7 +37,6 @@ const getIdBySeshkey = async (seshkey: string): Promise<number> => {
         .catch(e => {
             throw e;
         });
-    console.log(user);
     return user ? user.userid : -1;
 };
 

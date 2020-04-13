@@ -28,6 +28,7 @@
                     },
                     title: {
                         display: true,
+                        fontSize: 20,
                         text: 'Languages'
                     },
                     animation: {

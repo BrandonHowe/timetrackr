@@ -9,7 +9,6 @@ module.exports = (app) => {
         const userid = Number(req.params.userid);
         const midnight = Number(req.params.midnight);
         const totalDuration = await findTotalDuration(await getData(userid, midnight));
-        console.log(`Total duration: ${totalDuration}`);
         res.send(totalDuration.toString());
     });
     app.get("/userData/daysData/:userid/:midnight/:days", async (req, res) => {
@@ -159,7 +158,7 @@ module.exports = (app) => {
                 backgroundColor: ["#1E90FF"],
                 data: [percent, (100 - percent < 0 ? 0 : 100 - percent)],
             }],
-            labels: ["Time coded today", "Time not spent"],
+            labels: ["Time coded today", "Time not coded"],
         }));
     });
 };

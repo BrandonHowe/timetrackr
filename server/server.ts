@@ -12,6 +12,7 @@ app.use(cors());
 require("./heartbeats")(app);
 require("./login")(app);
 require("./data/dataRoutes")(app);
+require("./data/api")(app);
 
 const port = process.env.PORT || 1700;
 
