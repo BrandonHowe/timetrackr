@@ -15,6 +15,7 @@
         <DailyChart
             class="chart"
         ></DailyChart>
+        <DataBox></DataBox>
     </div>
 </template>
 
@@ -24,6 +25,7 @@
     import EditorChart from "../components/EditorChart.vue";
     import ProjectChart from "../components/ProjectChart.vue";
     import DailyChart from "../components/DailyChart.vue";
+    import DataBox from "../components/DataBox.vue";
 
     export default {
         name: 'data',
@@ -32,7 +34,8 @@
             EditorChart,
             LanguageChart,
             LineChart,
-            ProjectChart
+            ProjectChart,
+            DataBox
         }
     };
 </script>

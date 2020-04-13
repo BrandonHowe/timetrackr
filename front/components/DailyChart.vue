@@ -4,7 +4,7 @@
             ref="doughnutChart"
             :chart-data="datacollection"
             :options="options"
-            :height="300"
+            :height="250"
             :width="300"
         ></DoughnutChart>
     </div>
@@ -50,7 +50,7 @@
             }
         },
         methods: {
-            async getLanguages (user, timestamp, days) {
+            async getDaily (user, timestamp, days) {
                 const resp = await fetch(`${currentUrl}userData/timeTodayComparedToDays/${user}/${timestamp}/${days}`);
                 return await resp.json();
             },
@@ -75,7 +75,7 @@
                 return Number(d);
             },
             async fillData () {
-                this.datacollection = await this.getLanguages(1, this.getTimeOnDayAgo(0), 7);
+                this.datacollection = await this.getDaily(1, this.getTimeOnDayAgo(0), 7);
                 this.amountToday = this.msToTime(await this.getTotalToday(1, this.getTimeOnDayAgo(0)));
             },
         },

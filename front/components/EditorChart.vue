@@ -3,7 +3,7 @@
         <DoughnutChart
             :chart-data="datacollection"
             :options="options"
-            :height="300"
+            :height="250"
             :width="300"
         ></DoughnutChart>
     </div>
