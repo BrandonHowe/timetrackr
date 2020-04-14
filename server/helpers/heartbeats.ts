@@ -12,69 +12,61 @@ interface HeartbeatData {
     eventid: number
 }
 
-const newHeartbeat = async (userid: number, editor: string, project: string, language: string, file: string): Promise<boolean> => {
-    const currentTime = Date.now();
-    console.log(`${userid}|${editor}|${project}|${language}|${file}|${currentTime}|${currentTime - 300000}`);
-    const recentEvent = await knex("events")
-        .where({
-            userid,
-            editor,
-            project,
-            language,
-            file
-        })
-        .andWhere(
-            "timeend", ">", currentTime
-        )
-        .andWhere(
-            "timeend", "<", (currentTime + 300000)
-        )
-        .first()
-        .catch(e => {
-            throw e;
-        });
-    if (recentEvent) {
-        await knex("events")
-            .where({
-                eventid: recentEvent.eventid
-            })
-            .update({
-                timeend: currentTime + 300000
-            })
-            .then(() => {
-                return true;
-            })
-            .catch(() => {
-                return false;
+async function* heartbeat (submit: boolean, userid: number, editor: string, project: string, language: string, file: string): AsyncGenerator<boolean> {
+    let heartbeats = [];
+    while (true) {
+        if (submit === false) {
+            const currentTime = Date.now();
+            console.log(`${userid}|${editor}|${project}|${language}|${file}|${currentTime}|${currentTime - 300000}`);
+            const recentEvent = heartbeats.find(l => {
+                if (l.userid === userid && l.editor === editor && l.project === project && l.language === language && l.file === file) {
+                    if (l.timeend > currentTime) {
+                        return l.timeend < currentTime + 300000;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
             });
-        return false;
-    } else {
-        const heartbeat = {
-            userid,
-            timestart: currentTime,
-            timeend: currentTime + 300000,
-            editor,
-            project,
-            language,
-            file,
-            eventid: await getHighestEvent()
-        } as HeartbeatData;
-        await knex("events")
-            .update({timeend: currentTime})
-            .where("timeend", ">", currentTime)
-            .catch(e => {
-                throw e;
-            });
-        await knex("events")
-            .insert(heartbeat)
-            .then(() => {
-                return true;
-            })
-            .catch(() => {
-                return false;
-            });
-        return false;
+            if (recentEvent > -1) {
+                heartbeats.map(l => {
+                    if (l.eventid === recentEvent.eventid) {
+                        l.timeend = currentTime + 300000;
+                    }
+                });
+                yield true;
+            } else {
+                const heartbeat = {
+                    userid,
+                    timestart: currentTime,
+                    timeend: currentTime + 300000,
+                    editor,
+                    project,
+                    language,
+                    file,
+                    eventid: await getHighestEvent()
+                } as HeartbeatData;
+                heartbeats.map(l => {
+                    if (l.timeend > currentTime) {
+                        l.timeend = currentTime;
+                    }
+                });
+                heartbeats.push(heartbeat);
+                yield true;
+            }
+        } else {
+            await knex("events")
+                .insert(heartbeats)
+                .then(() => {
+                    heartbeats = [];
+                    return true;
+                })
+                .catch(() => {
+                    return false;
+                });
+        }
     }
-};
+}
 
-export { newHeartbeat, HeartbeatData }
+export { heartbeat, HeartbeatData }
