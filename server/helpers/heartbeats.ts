@@ -8,18 +8,17 @@ interface HeartbeatData {
     editor: string,
     project: string,
     language: string,
-    file: string,
     eventid: number
 }
 
-async function* heartbeat (submit: boolean, userid: number, editor: string, project: string, language: string, file: string): AsyncGenerator<boolean> {
+async function* heartbeat (submit: boolean, userid: number, editor: string, project: string, language: string): AsyncGenerator<boolean> {
     let heartbeats = [];
     while (true) {
         if (submit === false) {
             const currentTime = Date.now();
-            console.log(`${userid}|${editor}|${project}|${language}|${file}|${currentTime}|${currentTime - 300000}`);
+            console.log(`${userid}|${editor}|${project}|${language}|${currentTime}|${currentTime - 300000}`);
             const recentEvent = heartbeats.find(l => {
-                if (l.userid === userid && l.editor === editor && l.project === project && l.language === language && l.file === file) {
+                if (l.userid === userid && l.editor === editor && l.project === project && l.language === language) {
                     if (l.timeend > currentTime) {
                         return l.timeend < currentTime + 300000;
                     } else {
@@ -44,7 +43,6 @@ async function* heartbeat (submit: boolean, userid: number, editor: string, proj
                     editor,
                     project,
                     language,
-                    file,
                     eventid: await getHighestEvent()
                 } as HeartbeatData;
                 heartbeats.map(l => {

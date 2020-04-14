@@ -7,10 +7,9 @@ module.exports = (app) => {
         const editor = req.body.editor;
         const project = req.body.project;
         const language = req.body.language;
-        const file = req.body.file;
-        res.send(await heartbeat(false, await getIdBySeshkey(seshkey), editor, project, language, file));
+        res.send(await heartbeat(false, await getIdBySeshkey(seshkey), editor, project, language));
     });
     app.post('/sendHeartbeats', async (res) => {
-        res.send(await heartbeat(true, 0, "", "", "", ""));
+        res.send(await heartbeat(true, 0, "", "", ""));
     });
 };
