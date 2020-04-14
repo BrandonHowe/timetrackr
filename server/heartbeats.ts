@@ -9,7 +9,7 @@ module.exports = (app) => {
         const language = req.body.language;
         res.send(await heartbeat(false, await getIdBySeshkey(seshkey), editor, project, language));
     });
-    app.post('/sendHeartbeats', async (res) => {
+    app.post('/sendHeartbeats', async (req, res) => {
         res.send(await heartbeat(true, 0, "", "", ""));
     });
 };
