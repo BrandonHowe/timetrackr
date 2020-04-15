@@ -11,9 +11,11 @@ interface HeartbeatData {
     eventid: number
 }
 
-async function* heartbeat (submit: boolean, userid: number, editor: string, project: string, language: string): AsyncGenerator<boolean> {
+async function* heartbeat (): AsyncGenerator<boolean, boolean, Array<any>> {
     let heartbeats = [];
     while (true) {
+        const yieldData = yield;
+        const [submit, userid, editor, project, language] = yieldData;
         if (submit === false) {
             const currentTime = Date.now();
             console.log(`${userid}|${editor}|${project}|${language}|${currentTime}|${currentTime - 300000}`);
@@ -34,7 +36,6 @@ async function* heartbeat (submit: boolean, userid: number, editor: string, proj
                         l.timeend = currentTime + 300000;
                     }
                 });
-                yield true;
             } else {
                 const heartbeat = {
                     userid,
@@ -51,20 +52,20 @@ async function* heartbeat (submit: boolean, userid: number, editor: string, proj
                     }
                 });
                 heartbeats.push(heartbeat);
-                yield true;
             }
         } else {
             await knex("events")
                 .insert(heartbeats)
                 .then(() => {
                     heartbeats = [];
-                    return true;
                 })
                 .catch(() => {
-                    return false;
                 });
         }
     }
 }
 
-export { heartbeat, HeartbeatData }
+const eventHeartbeats = heartbeat();
+eventHeartbeats.next();
+
+export { eventHeartbeats, HeartbeatData }

@@ -1,4 +1,4 @@
-import { heartbeat } from "./helpers/heartbeats";
+import { eventHeartbeats } from "./helpers/heartbeats";
 import { getIdBySeshkey } from "./helpers/helpers";
 
 module.exports = (app) => {
@@ -7,9 +7,9 @@ module.exports = (app) => {
         const editor = req.body.editor;
         const project = req.body.project;
         const language = req.body.language;
-        res.send(await heartbeat(false, await getIdBySeshkey(seshkey), editor, project, language));
+        res.send(await eventHeartbeats.next([false, await getIdBySeshkey(seshkey), editor, project, language]));
     });
     app.post('/sendHeartbeats', async (req, res) => {
-        res.send(await heartbeat(true, 0, "", "", ""));
+        res.send(await eventHeartbeats.next([true, 0, "", "", ""]));
     });
 };
