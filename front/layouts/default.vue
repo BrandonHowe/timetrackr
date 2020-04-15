@@ -80,13 +80,13 @@
                 items: [
                     {
                         icon: 'mdi-apps',
-                        title: 'Welcome',
-                        to: '/',
+                        title: 'Home',
+                        to: '/data',
                     },
                     {
                         icon: 'mdi-chart-bubble',
-                        title: 'Inspire',
-                        to: '/inspire',
+                        title: 'About us',
+                        to: '/about',
                     },
                 ],
                 miniVariant: false,

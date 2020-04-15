@@ -13,6 +13,7 @@ interface HeartbeatData {
 
 async function* heartbeat (): AsyncGenerator<boolean, boolean, Array<any>> {
     let heartbeats = [];
+    let lowest = 0;
     while (true) {
         const yieldData = yield;
         const [submit, userid, editor, project, language] = yieldData;
@@ -46,6 +47,9 @@ async function* heartbeat (): AsyncGenerator<boolean, boolean, Array<any>> {
                     language,
                     eventid: await getHighestEvent()
                 } as HeartbeatData;
+                if (lowest === 0 || lowest > currentTime) {
+                    lowest = currentTime;
+                }
                 heartbeats.map(l => {
                     if (l.timeend > currentTime) {
                         l.timeend = currentTime;
@@ -54,6 +58,16 @@ async function* heartbeat (): AsyncGenerator<boolean, boolean, Array<any>> {
                 heartbeats.push(heartbeat);
             }
         } else {
+            await knex("events")
+                .where(
+                    "timeend", ">", lowest
+                )
+                .update({
+                    timeend: lowest
+                })
+                .catch(e => {
+                    throw e
+                });
             await knex("events")
                 .insert(heartbeats)
                 .then(() => {

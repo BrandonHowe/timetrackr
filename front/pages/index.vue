@@ -71,9 +71,9 @@
                     <v-btn
                         color="primary"
                         nuxt
-                        to="/inspire"
+                        to="/data"
                     >
-                        Continue
+                        Data
                     </v-btn>
                 </v-card-actions>
             </v-card>
