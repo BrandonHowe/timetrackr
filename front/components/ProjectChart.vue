@@ -11,15 +11,18 @@
 
 <script>
     import DoughnutChart from "./ChartData/DoughnutChart";
-    import { currentUrl } from "../assets/config";
+
     export default {
         name: "ProjectChart",
         components: {
             DoughnutChart
         },
+        props: {
+            projectData: Object
+        },
         data () {
             return {
-                datacollection: {},
+                datacollection: this.projectData,
                 options: {
                     responsive: false,
                     legend: {
@@ -57,24 +60,6 @@
                     },
                 }
             }
-        },
-        methods: {
-            async getLanguages (user, timestamp, days) {
-                const resp = await fetch(`${currentUrl}userData/projectData/${user}/${timestamp}/${days}`);
-                return await resp.json();
-            },
-            getTimeOnDayAgo (daysAgo = 0) {
-                let d = new Date();
-                d.setDate(d.getDate() - daysAgo + 1);
-                d.setUTCHours(0, 0, 0, 0);
-                return Number(d);
-            },
-            async fillData () {
-                this.datacollection = await this.getLanguages(1, this.getTimeOnDayAgo(0), 7);
-            },
-        },
-        mounted () {
-            this.fillData();
         }
     }
 </script>
