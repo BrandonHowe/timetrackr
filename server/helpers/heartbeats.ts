@@ -38,6 +38,7 @@ const heartbeat = async (userid, editor, project, language) => {
                 project,
                 language
             })
+            .andWhere("timeend", ">", currentTime)
             .catch(e => {
                 throw e;
             });
