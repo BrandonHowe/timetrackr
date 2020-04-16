@@ -1,5 +1,5 @@
 import knex from "../../knex";
-import { getHighestEvent, getHighestUserId } from "./helpers";
+import { getHighestEvent } from "./helpers";
 
 interface HeartbeatData {
     userid: number,
@@ -26,6 +26,7 @@ const heartbeat = async (userid, editor, project, language) => {
         .catch(e => {
             throw e;
         });
+    console.log(`${currentTime}|${currentTime + 300000}|${userid}|${editor}|${project}|${language}|${!!eventExists}`);
     if (eventExists) {
         await knex("events")
             .update({
@@ -41,6 +42,17 @@ const heartbeat = async (userid, editor, project, language) => {
                 throw e;
             });
     } else {
+        await knex("events")
+            .update({
+                timeend: currentTime
+            })
+            .where({
+                userid
+            })
+            .andWhere("timeend", ">", currentTime)
+            .catch(e => {
+                throw e;
+            });
         await knex("events")
             .insert({
                 userid,
