@@ -1,5 +1,5 @@
 import knex from "../../knex";
-import { getHighestEvent } from "./helpers";
+import { getHighestEvent, getHighestUserId } from "./helpers";
 
 interface HeartbeatData {
     userid: number,
@@ -11,75 +11,50 @@ interface HeartbeatData {
     eventid: number
 }
 
-async function* heartbeat (): AsyncGenerator<boolean, boolean, Array<any>> {
-    let heartbeats = [];
-    let lowest = 0;
-    while (true) {
-        const yieldData = yield;
-        const [submit, userid, editor, project, language] = yieldData;
-        if (submit === false) {
-            const currentTime = Date.now();
-            console.log(`${userid}|${editor}|${project}|${language}|${currentTime}|${currentTime - 300000}`);
-            const recentEvent = heartbeats.find(l => {
-                if (l.userid === userid && l.editor === editor && l.project === project && l.language === language) {
-                    if (l.timeend > currentTime) {
-                        return l.timeend < currentTime + 300000;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
+const heartbeat = async (userid, editor, project, language) => {
+    const currentTime = Date.now();
+    const eventExists = await knex("events")
+        .where({
+            userid,
+            editor,
+            project,
+            language
+        })
+        .andWhere("timeend", ">", currentTime)
+        .andWhere("timeend", "<", currentTime + 300000)
+        .first()
+        .catch(e => {
+            throw e;
+        });
+    if (eventExists) {
+        await knex("events")
+            .update({
+                timeend: currentTime + 300000
+            })
+            .where({
+                userid,
+                editor,
+                project,
+                language
+            })
+            .catch(e => {
+                throw e;
             });
-            if (recentEvent > -1) {
-                heartbeats.map(l => {
-                    if (l.eventid === recentEvent.eventid) {
-                        l.timeend = currentTime + 300000;
-                    }
-                });
-            } else {
-                const heartbeat = {
-                    userid,
-                    timestart: currentTime,
-                    timeend: currentTime + 300000,
-                    editor,
-                    project,
-                    language,
-                    eventid: await getHighestEvent()
-                } as HeartbeatData;
-                if (lowest === 0 || lowest > currentTime) {
-                    lowest = currentTime;
-                }
-                heartbeats.map(l => {
-                    if (l.timeend > currentTime) {
-                        l.timeend = currentTime;
-                    }
-                });
-                heartbeats.push(heartbeat);
-            }
-        } else {
-            await knex("events")
-                .where(
-                    "timeend", ">", lowest
-                )
-                .update({
-                    timeend: lowest
-                })
-                .catch(e => {
-                    throw e
-                });
-            await knex("events")
-                .insert(heartbeats)
-                .then(() => {
-                    heartbeats = [];
-                })
-                .catch(() => {
-                });
-        }
+    } else {
+        await knex("events")
+            .insert({
+                userid,
+                editor,
+                project,
+                language,
+                timestart: currentTime,
+                timeend: currentTime + 300000,
+                eventid: await getHighestEvent()
+            })
+            .catch(e => {
+                throw e;
+            })
     }
-}
+};
 
-const eventHeartbeats = heartbeat();
-eventHeartbeats.next();
-
-export { eventHeartbeats, HeartbeatData }
+export { heartbeat, HeartbeatData }

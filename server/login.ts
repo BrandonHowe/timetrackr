@@ -130,6 +130,6 @@ module.exports = (app) => {
     });
 
     app.get("/", (req, res) => {
-        res.send("Hello world");
+        res.send("Welcome to the TimeTrackr server! This probably isn't what you're looking for, as the real site will be up soon. This is just where the API is in case you want to do anything. API docs can be found... somewhere. Not up yet. Glad to see you're interested in the project :)");
     })
 };
