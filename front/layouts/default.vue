@@ -85,8 +85,13 @@
                     },
                     {
                         icon: 'mdi-chart-bubble',
-                        title: 'About us',
+                        title: 'About',
                         to: '/about',
+                    },
+                    {
+                        icon: 'mdi-account',
+                        title: 'Login',
+                        to: '/login',
                     },
                 ],
                 miniVariant: false,
