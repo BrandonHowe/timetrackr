@@ -1,7 +1,7 @@
 <template>
     <div class="small">
         <LineChart
-            :chart-data="datacollection"
+            :chart-data="data"
             :options="options"
             :height="250"
             :width="300"
@@ -17,6 +17,9 @@
         name: "RandomChart",
         components: {
             LineChart,
+        },
+        props: {
+            data: Object
         },
         data () {
             return {
@@ -53,14 +56,10 @@
                             label: (tooltipItem, data) => {
                                 if (tooltipItem.yLabel > 0) {
                                     const duration = Number(tooltipItem.yLabel);
-                                    let seconds = Math.floor((duration / 1000) % 60),
+                                    const seconds = Math.floor((duration / 1000) % 60),
                                         minutes = Math.floor((duration / (1000 * 60)) % 60),
                                         hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
-
-                                    hours = (hours < 10) ? "0" + hours : hours;
-                                    minutes = (minutes < 10) ? "0" + minutes : minutes;
-                                    seconds = (seconds < 10) ? "0" + seconds : seconds;
-                                    return `${`${data.datasets[tooltipItem.datasetIndex].label}:` || ''} ${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds > 0 ? `${seconds}s` : ""}`;
+                                    return `${`${data.labels[tooltipItem.index]}:` || ''} ${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds > 0 || minutes === 0 && hours === 0 ? `${seconds}s` : ""}`;
                                 } else {
                                     return "";
                                 }
