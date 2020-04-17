@@ -72,9 +72,4 @@ const getProjectData = async (userid: number, midnight: number, days: number = 1
     return data;
 };
 
-const getTotalOverDays = async (userid: number, midnight: number, days: number = 1) => {
-    const events = await getData(userid, midnight, days);
-    return events.reduce((acc, cur) => Number(acc + Number(cur.timeend) - Number(cur.timestart)), 0);
-};
-
-export { getData, getDataDays, getLanguagesData, getEditorData, getProjectData, getTotalOverDays }
+export { getData, getDataDays, getLanguagesData, getEditorData, getProjectData }
