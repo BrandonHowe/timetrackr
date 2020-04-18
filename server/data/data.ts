@@ -15,15 +15,14 @@ const getData = async (userid: number, midnight: number, days: number = 1): Prom
 const getDataDays = async (userid: number, midnight: number, days: number = 1): Promise<HeartbeatData[][]> => {
     const lastMidnight = midnight - (86400000 * days);
     const events = await getData(userid, midnight, days);
-    let eventObj: Record<number, HeartbeatData[]> = {};
-    for (let i in events) {
-        const event = events[i];
-        if (eventObj[Math.floor((event.timestart - lastMidnight) / 86400000)]) {
-            eventObj[Math.floor((event.timestart - lastMidnight) / 86400000)].push(event);
+    const eventObj = events.reduce<Map<number, HeartbeatData[]>>((acc, cur) => {
+        if (acc[Math.floor((cur.timestart - lastMidnight) / 86400000)]) {
+            acc[Math.floor((cur.timestart - lastMidnight) / 86400000)].push(cur);
         } else {
-            eventObj[Math.floor((event.timestart - lastMidnight) / 86400000)] = [event];
+            acc[Math.floor((cur.timestart - lastMidnight) / 86400000)] = [cur];
         }
-    }
+        return acc;
+    }, new Map());
     for (let i = 0; i < days; i++) {
         if (!eventObj[i]) {
             eventObj[i] = [];

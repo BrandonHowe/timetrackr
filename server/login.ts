@@ -1,5 +1,6 @@
 import knex from "../knex";
 import { doesUserExist, getHighestUserId } from "./helpers/helpers";
+import { match } from "assert";
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 
@@ -26,6 +27,8 @@ module.exports = (app) => {
                         throw e;
                     });
                 res.send({success: true, data: seshkey});
+            } else {
+                res.send({success: false, data: null});
             }
         } else {
             res.send({success: false, data: null})
@@ -44,16 +47,7 @@ module.exports = (app) => {
         if (matchingUser) {
             const passMatches = await bcrypt.compare(password, matchingUser.password);
             if (passMatches) {
-                const seshkey = crypto.randomBytes(16).toString('hex').substring(0, 16);
-                await knex("users")
-                    .where({username})
-                    .update({
-                        seshkey
-                    })
-                    .catch(e => {
-                        throw e;
-                    });
-                res.send(seshkey);
+                res.send(JSON.stringify(matchingUser.pluginkey));
             } else {
                 res.send("false");
             }
@@ -71,16 +65,16 @@ module.exports = (app) => {
                 throw e;
             });
         if (matchingUser) {
-            res.send({status: true});
+            res.send({status: true, userid: matchingUser.userid});
         } else {
             res.send({status: false});
         }
     });
 
-    app.post('/loginSeshkeyIntellij', async (req, res) => {
-        const seshkey = req.body.seshkey;
+    app.post('/loginPluginkeyIntellij', async (req, res) => {
+        const pluginkey = req.body.pluginkey;
         const matchingUser = await knex("users")
-            .where({seshkey})
+            .where({pluginkey})
             .first()
             .catch(e => {
                 throw e;
@@ -112,12 +106,14 @@ module.exports = (app) => {
         ]);
         if (!userExists) {
             const seshkey = crypto.randomBytes(16).toString('hex').substring(0, 16);
-            console.log(`${username}|${password}|${seshkey}`);
+            const pluginkey = crypto.randomBytes(16).toString('hex').substring(0, 16);
+            console.log(`${username}|${password}|${seshkey}|${pluginkey}`);
             await knex("users")
                 .insert({
                     username,
                     password,
                     seshkey,
+                    pluginkey,
                     userid: await getHighestUserId()
                 })
                 .catch(e => {
